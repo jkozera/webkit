@@ -128,6 +128,8 @@ public:
             m_height = minimumSize.height();
     }
 
+    IntSize constrainedBetween(const IntSize& min, const IntSize& max) const;
+
     template <typename T = WTF::CrashOnOverflow>
     Checked<unsigned, T> area() const
     {
