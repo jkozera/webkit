@@ -166,14 +166,33 @@ bool ImageBuffer::copyToPlatformTexture(GraphicsContext3D&, GC3Denum, Platform3D
 }
 #endif
 
-std::unique_ptr<ImageBuffer> ImageBuffer::createCompatibleBuffer(const FloatSize& size, const GraphicsContext& context, bool hasAlpha)
+std::unique_ptr<ImageBuffer> ImageBuffer::createCompatibleBuffer(const FloatSize& size, const GraphicsContext& context)
+{
+    if (size.isEmpty())
+        return nullptr;
+
+    IntSize scaledSize = ImageBuffer::compatibleBufferSize(size, context);
+    float resolutionScale = context.scaleFactor().width();
+    RenderingMode renderingMode = context.renderingMode();
+    bool success = false;
+    std::unique_ptr<ImageBuffer> buffer(new ImageBuffer(scaledSize, resolutionScale, ColorSpaceDeviceRGB, renderingMode, success));
+
+    if (!success)
+        return nullptr;
+
+    // Set up a corresponding scale factor on the graphics context.
+    buffer->context().scale(FloatSize(scaledSize.width() / size.width(), scaledSize.height() / size.height()));
+    return buffer;
+}
+
+std::unique_ptr<ImageBuffer> ImageBuffer::createCompatibleBuffer(const FloatSize& size, ColorSpace colorSpace, const GraphicsContext& context)
 {
     if (size.isEmpty())
         return nullptr;
 
     IntSize scaledSize = ImageBuffer::compatibleBufferSize(size, context);
 
-    auto buffer = ImageBuffer::createCompatibleBuffer(scaledSize, 1, ColorSpaceSRGB, context, hasAlpha);
+    auto buffer = ImageBuffer::createCompatibleBuffer(scaledSize, 1, colorSpace, context);
     if (!buffer)
         return nullptr;
 
@@ -182,7 +201,7 @@ std::unique_ptr<ImageBuffer> ImageBuffer::createCompatibleBuffer(const FloatSize
     return buffer;
 }
 
-std::unique_ptr<ImageBuffer> ImageBuffer::createCompatibleBuffer(const FloatSize& size, float resolutionScale, ColorSpace colorSpace, const GraphicsContext& context, bool)
+std::unique_ptr<ImageBuffer> ImageBuffer::createCompatibleBuffer(const FloatSize& size, float resolutionScale, ColorSpace colorSpace, const GraphicsContext& context)
 {
     return create(size, context.renderingMode(), resolutionScale, colorSpace);
 }
