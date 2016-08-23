@@ -41,6 +41,7 @@ void CustomProtocolManager::initialize(const NetworkProcessCreationParameters& p
 
 void CustomProtocolManager::registerScheme(const String& scheme)
 {
+    ASSERT_NOT_REACHED();
 }
 
 void CustomProtocolManager::unregisterScheme(const String&)
@@ -54,6 +55,7 @@ bool CustomProtocolManager::supportsScheme(const String& scheme)
 
 void CustomProtocolManager::didFailWithError(uint64_t customProtocolID, const WebCore::ResourceError& error)
 {
+    ASSERT_NOT_REACHED();
 }
 
 void CustomProtocolManager::didLoadData(uint64_t customProtocolID, const IPC::DataReference& dataReference)
