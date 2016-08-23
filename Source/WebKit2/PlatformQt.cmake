@@ -38,7 +38,6 @@ list(APPEND WebKit2_INCLUDE_DIRECTORIES
 )
 
 list(APPEND WebKit2_SOURCES
-    NetworkProcess/CustomProtocols/qt/CustomProtocolManagerImpl.cpp
     NetworkProcess/CustomProtocols/qt/CustomProtocolManagerQt.cpp
 
     NetworkProcess/Downloads/qt/DownloadQt.cpp
