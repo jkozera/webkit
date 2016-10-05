@@ -329,17 +329,29 @@ QQuickWebViewPrivate::~QQuickWebViewPrivate()
 // Note: we delay this initialization to make sure that QQuickWebView has its d-ptr in-place.
 void QQuickWebViewPrivate::initialize(WKPageConfigurationRef configurationRef)
 {
-    pageConfiguration = configurationRef;
-    if (!pageConfiguration)
-        pageConfiguration = adoptWK(WKPageConfigurationCreate()); // API::PageConfiguration::create();
+//    pageConfiguration = configurationRef;
+//    qDebug() << pageConfiguration.get();
+//    if (!pageConfiguration) {
+//        pageConfiguration = adoptWK(WKPageConfigurationCreate()); // API::PageConfiguration::create();
 
-    pageGroup = WKPageConfigurationGetPageGroup(configurationRef);
-    if (!pageGroup)
-        pageGroup = adoptWK(WKPageGroupCreateWithIdentifier(0));
+    WKRetainPtr<WKPageConfigurationRef> pageConfiguration;
+    qDebug() << pageConfiguration.get();
 
-    WKContextRef contextRef = WKPageConfigurationGetContext(configurationRef);
+//    pageGroup = WKPageConfigurationGetPageGroup(configurationRef);
+//    if (!pageGroup)
+//        pageGroup = adoptWK(WKPageGroupCreateWithIdentifier(0));
+
+    WKContextRef contextRef = nullptr;
+    if (configurationRef) {
+        pageConfiguration = configurationRef;
+        contextRef = WKPageConfigurationGetContext(configurationRef);
+    } else {
+        pageConfiguration = adoptWK(WKPageConfigurationCreate());
+    }
+
     context = configurationRef ? QtWebContext::create(contextRef) : QtWebContext::defaultContext();
-    webPageProxy = toImpl(context->context())->createWebPage(pageClient, toImpl(configurationRef)->copy());
+
+    webPageProxy = toImpl(context->context())->createWebPage(pageClient, toImpl(pageConfiguration.get())->copy());
     webPage = toAPI(webPageProxy.get());
     pageToView()->insert(webPage.get(), this);
 
@@ -390,14 +402,14 @@ void QQuickWebViewPrivate::initialize(WKPageConfigurationRef configurationRef)
     QObject::connect(iconDatabase, SIGNAL(iconChangedForPageURL(QString)), q_ptr, SLOT(_q_onIconChangedForPageURL(QString)));
 
     // Any page setting should preferrable be set before creating the page.
-    WKPreferencesRef preferencesRef = WKPageGroupGetPreferences(pageGroup.get());
-    WKPreferencesSetAcceleratedCompositingEnabled(preferencesRef, true);
+    auto& preferences = webPageProxy->pageGroup().preferences();
+    preferences.setAcceleratedCompositingEnabled(true);
     bool showDebugVisuals = qgetenv("WEBKIT_SHOW_COMPOSITING_DEBUG_VISUALS") == "1";
-    WKPreferencesSetCompositingBordersVisible(preferencesRef, showDebugVisuals);
-    WKPreferencesSetCompositingRepaintCountersVisible(preferencesRef, showDebugVisuals);
-    WKPreferencesSetFrameFlatteningEnabled(preferencesRef, true);
-    WKPreferencesSetWebGLEnabled(preferencesRef, true);
-    webPageProxy->pageGroup().preferences().setForceCompositingMode(true);
+    preferences.setCompositingBordersVisible(showDebugVisuals);
+    preferences.setCompositingRepaintCountersVisible(showDebugVisuals);
+    preferences.setFrameFlatteningEnabled(true);
+    preferences.setWebGLEnabled(true);
+    preferences.setForceCompositingMode(true);
 
     pageClient.initialize(q_ptr, pageEventHandler.data(), &undoController);
     webPageProxy->initializeWebPage();
@@ -914,30 +926,30 @@ static WKRetainPtr<WKStringRef> readUserFile(const QUrl& url, const char* userFi
 
 void QQuickWebViewPrivate::updateUserScripts()
 {
-    // This feature works per-WebView because we keep an unique page group for
-    // each Page/WebView pair we create.
-    WKPageGroupRemoveAllUserScripts(pageGroup.get());
+//    // This feature works per-WebView because we keep an unique page group for
+//    // each Page/WebView pair we create.
+//    WKPageGroupRemoveAllUserScripts(pageGroup.get());
 
-    foreach (const QUrl& url, userScripts) {
-        WKRetainPtr<WKStringRef> contents = readUserFile(url, "user script");
-        if (!contents || WKStringIsEmpty(contents.get()))
-            continue;
-        WKPageGroupAddUserScript(pageGroup.get(), contents.get(), /*baseURL*/ 0, /*whitelistedURLPatterns*/ 0, /*blacklistedURLPatterns*/ 0, kWKInjectInTopFrameOnly, kWKInjectAtDocumentEnd);
-    }
+//    foreach (const QUrl& url, userScripts) {
+//        WKRetainPtr<WKStringRef> contents = readUserFile(url, "user script");
+//        if (!contents || WKStringIsEmpty(contents.get()))
+//            continue;
+//        WKPageGroupAddUserScript(pageGroup.get(), contents.get(), /*baseURL*/ 0, /*whitelistedURLPatterns*/ 0, /*blacklistedURLPatterns*/ 0, kWKInjectInTopFrameOnly, kWKInjectAtDocumentEnd);
+//    }
 }
 
 void QQuickWebViewPrivate::updateUserStyleSheets()
 {
-    // This feature works per-WebView because we keep an unique page group for
-    // each Page/WebView pair we create.
-    WKPageGroupRemoveAllUserStyleSheets(pageGroup.get());
+//    // This feature works per-WebView because we keep an unique page group for
+//    // each Page/WebView pair we create.
+//    WKPageGroupRemoveAllUserStyleSheets(pageGroup.get());
 
-    foreach (const QUrl& url, userStyleSheets) {
-        WKRetainPtr<WKStringRef> contents = readUserFile(url, "user style sheet");
-        if (!contents || WKStringIsEmpty(contents.get()))
-            continue;
-        WKPageGroupAddUserStyleSheet(pageGroup.get(), contents.get(), /*baseURL*/ 0, /*whitelistedURLPatterns*/ 0, /*blacklistedURLPatterns*/ 0, kWKInjectInTopFrameOnly);
-    }
+//    foreach (const QUrl& url, userStyleSheets) {
+//        WKRetainPtr<WKStringRef> contents = readUserFile(url, "user style sheet");
+//        if (!contents || WKStringIsEmpty(contents.get()))
+//            continue;
+//        WKPageGroupAddUserStyleSheet(pageGroup.get(), contents.get(), /*baseURL*/ 0, /*whitelistedURLPatterns*/ 0, /*blacklistedURLPatterns*/ 0, kWKInjectInTopFrameOnly);
+//    }
 }
 
 void QQuickWebViewPrivate::updateSchemeDelegates()
