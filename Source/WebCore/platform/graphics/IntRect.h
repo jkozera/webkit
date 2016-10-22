@@ -137,7 +137,9 @@ public:
     IntPoint maxXMinYCorner() const { return IntPoint(m_location.x() + m_size.width(), m_location.y()); } // typically topRight
     IntPoint minXMaxYCorner() const { return IntPoint(m_location.x(), m_location.y() + m_size.height()); } // typically bottomLeft
     IntPoint maxXMaxYCorner() const { return IntPoint(m_location.x() + m_size.width(), m_location.y() + m_size.height()); } // typically bottomRight
-    
+
+    template <typename T = WTF::CrashOnOverflow>
+    Checked<unsigned, T> area() const { return m_size.area<T>(); }
     WEBCORE_EXPORT bool intersects(const IntRect&) const;
     WEBCORE_EXPORT bool contains(const IntRect&) const;
 

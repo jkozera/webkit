@@ -113,7 +113,7 @@ PassRefPtr<ImageData> ImageData::create(PassRefPtr<Uint8ClampedArray> byteArray,
 
 ImageData::ImageData(const IntSize& size)
     : m_size(size)
-    , m_data(Uint8ClampedArray::createUninitialized(size.width() * size.height() * 4))
+    , m_data(Uint8ClampedArray::createUninitialized((size.area() * 4).unsafeGet()))
 {
     ASSERT_WITH_SECURITY_IMPLICATION(m_data);
 }
@@ -122,7 +122,7 @@ ImageData::ImageData(const IntSize& size, PassRefPtr<Uint8ClampedArray> byteArra
     : m_size(size)
     , m_data(byteArray)
 {
-    ASSERT_WITH_SECURITY_IMPLICATION(static_cast<unsigned>(size.width() * size.height() * 4) <= m_data->length());
+    ASSERT_WITH_SECURITY_IMPLICATION(!m_data || (size.area() * 4).unsafeGet() <= m_data->length());
 }
 
 }
