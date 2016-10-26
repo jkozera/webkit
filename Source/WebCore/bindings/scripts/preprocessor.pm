@@ -24,6 +24,7 @@ use warnings;
 use Config;
 use IPC::Open2;
 use IPC::Open3;
+use Text::ParseWords;
 
 BEGIN {
    use Exporter   ();
@@ -98,10 +99,8 @@ sub applyPreprocessor
                 sleep 1;
             }
         };
-    } elsif ($Config::Config{"osname"} eq "MSWin32") {
-        $pid = open2(\*PP_OUT, \*PP_IN, $preprocessor, @args, @macros, $fileName);
     } else {
-        $pid = open2(\*PP_OUT, \*PP_IN, split(' ', $preprocessor), @args, @macros, $fileName);
+        $pid = open2(\*PP_OUT, \*PP_IN, shellwords($preprocessor), @args, @macros, $fileName);
     }
     close PP_IN;
     my @documentContent = <PP_OUT>;
