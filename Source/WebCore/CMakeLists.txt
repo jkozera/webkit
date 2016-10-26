@@ -3758,6 +3758,10 @@ endif ()
 
 WEBKIT_FRAMEWORK(WebCore)
 
+if (NOT MSVC AND WIN32 AND ${PORT} STREQUAL "Qt")
+    ADD_PREFIX_HEADER(WebCore "${WEBCORE_DIR}/WebCorePrefix.h")
+endif ()
+
 # The -ftree-sra optimization (implicit with -O2) causes crashes when
 # allocating large chunks of memory using bmalloc on Intel 32bit.
 # See https://bugs.webkit.org/show_bug.cgi?id=146440
