@@ -148,10 +148,6 @@ public:
     
     const TextCheckerState& textCheckerState() const { return m_textCheckerState; }
 
-#if PLATFORM(QT)
-    QNetworkAccessManager* networkAccessManager() { return m_networkAccessManager; }
-#endif
-
     void clearResourceCaches(ResourceCachesToClear = AllResourceCaches);
     
 #if ENABLE(NETSCAPE_PLUGIN_API)
@@ -255,10 +251,6 @@ private:
     void startMemorySampler(const SandboxExtension::Handle&, const String&, const double);
     void stopMemorySampler();
 
-#if PLATFORM(QT)
-    void startTransfer(uint64_t downloadID, const String& destination);
-#endif
-
     void setTextCheckerState(const TextCheckerState&);
     
     void getWebCoreStatistics(uint64_t callbackID);
@@ -340,9 +332,10 @@ private:
 
     bool m_fullKeyboardAccessEnabled;
 
-#if PLATFORM(QT)
-    QNetworkAccessManager* m_networkAccessManager;
-#endif
+    // QTFIXME: leftover of old process model
+//#if PLATFORM(QT)
+//    QNetworkAccessManager* m_networkAccessManager { nullptr };
+//#endif
 
     HashMap<uint64_t, WebFrame*> m_frameMap;
 
