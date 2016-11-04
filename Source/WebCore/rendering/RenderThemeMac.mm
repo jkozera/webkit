@@ -912,7 +912,7 @@ bool RenderThemeMac::paintMenuList(const RenderObject& renderer, const PaintInfo
         inflatedRect.setWidth(inflatedRect.width() / zoomLevel);
         inflatedRect.setHeight(inflatedRect.height() / zoomLevel);
         paintInfo.context().translate(inflatedRect.x(), inflatedRect.y());
-        paintInfo.context().scale(FloatSize(zoomLevel, zoomLevel));
+        paintInfo.context().scale(zoomLevel);
         paintInfo.context().translate(-inflatedRect.x(), -inflatedRect.y());
     }
 
@@ -1533,7 +1533,7 @@ bool RenderThemeMac::paintSliderThumb(const RenderObject& o, const PaintInfo& pa
         unzoomedRect.setWidth(unzoomedRect.width() / zoomLevel);
         unzoomedRect.setHeight(unzoomedRect.height() / zoomLevel);
         paintInfo.context().translate(unzoomedRect.x(), unzoomedRect.y());
-        paintInfo.context().scale(FloatSize(zoomLevel, zoomLevel));
+        paintInfo.context().scale(zoomLevel);
         paintInfo.context().translate(-unzoomedRect.x(), -unzoomedRect.y());
     }
 
@@ -1564,7 +1564,7 @@ bool RenderThemeMac::paintSearchField(const RenderObject& o, const PaintInfo& pa
         unzoomedRect.setWidth(unzoomedRect.width() / zoomLevel);
         unzoomedRect.setHeight(unzoomedRect.height() / zoomLevel);
         paintInfo.context().translate(unzoomedRect.x(), unzoomedRect.y());
-        paintInfo.context().scale(FloatSize(zoomLevel, zoomLevel));
+        paintInfo.context().scale(zoomLevel);
         paintInfo.context().translate(-unzoomedRect.x(), -unzoomedRect.y());
     }
 
@@ -1671,7 +1671,7 @@ bool RenderThemeMac::paintSearchFieldCancelButton(const RenderBox& box, const Pa
         unzoomedRect.setWidth(unzoomedRect.width() / zoomLevel);
         unzoomedRect.setHeight(unzoomedRect.height() / zoomLevel);
         paintInfo.context().translate(unzoomedRect.x(), unzoomedRect.y());
-        paintInfo.context().scale(FloatSize(zoomLevel, zoomLevel));
+        paintInfo.context().scale(zoomLevel);
         paintInfo.context().translate(-unzoomedRect.x(), -unzoomedRect.y());
     }
 
@@ -1787,7 +1787,7 @@ bool RenderThemeMac::paintSearchFieldResultsButton(const RenderBox& box, const P
         unzoomedRect.setWidth(unzoomedRect.width() / zoomLevel);
         unzoomedRect.setHeight(unzoomedRect.height() / zoomLevel);
         paintInfo.context().translate(unzoomedRect.x(), unzoomedRect.y());
-        paintInfo.context().scale(FloatSize(zoomLevel, zoomLevel));
+        paintInfo.context().scale(zoomLevel);
         paintInfo.context().translate(-unzoomedRect.x(), -unzoomedRect.y());
     }
 

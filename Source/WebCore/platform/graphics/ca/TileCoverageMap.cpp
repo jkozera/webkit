@@ -97,18 +97,18 @@ void TileCoverageMap::update()
     float indicatorScale = scale * m_controller.tileGrid().scale();
 
     FloatRect mapBounds = containerBounds;
-    mapBounds.scale(indicatorScale, indicatorScale);
+    mapBounds.scale(indicatorScale);
 
     m_layer.get().setPosition(m_position + FloatPoint(2, 2));
     m_layer.get().setBounds(mapBounds);
     m_layer.get().setNeedsDisplay();
 
-    visibleRect.scale(indicatorScale, indicatorScale);
+    visibleRect.scale(indicatorScale);
     visibleRect.expand(2, 2);
     m_visibleRectIndicatorLayer->setPosition(visibleRect.location());
     m_visibleRectIndicatorLayer->setBounds(FloatRect(FloatPoint(), visibleRect.size()));
 
-    coverageRect.scale(indicatorScale, indicatorScale);
+    coverageRect.scale(indicatorScale);
     coverageRect.expand(2, 2);
     m_coverageRectIndicatorLayer->setPosition(coverageRect.location());
     m_coverageRectIndicatorLayer->setBounds(FloatRect(FloatPoint(), coverageRect.size()));
