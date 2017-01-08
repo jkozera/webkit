@@ -45,6 +45,29 @@
 #include "OpenGLShims.h"
 #endif
 
+#if PLATFORM(QT)
+
+///////////////////////////////////////////////////////////////////////////////
+// HALT!
+//
+// This macro breaks if clauses with single statement, i.e. all code looking
+// like
+//
+//   if (...)
+//       ::glThingy(...)
+//
+//  starts calling glThingy unconditionally. Fix it before merging this changes!
+//
+///////////////////////////////////////////////////////////////////////////////
+
+ALWAYS_INLINE static void doNothing() {}
+#define GLFUN(f) doNothing(); m_context->m_functions->f
+
+#define glBlitFramebufferEXT                    GLFUN(glBlitFramebuffer)
+#define glRenderbufferStorageMultisampleEXT     GLFUN(glRenderbufferStorageMultisample)
+
+#endif
+
 // Note this implementation serves a double role for Qt where it also handles OpenGLES.
 
 namespace WebCore {
@@ -68,20 +91,12 @@ Extensions3DOpenGL::~Extensions3DOpenGL()
 
 void Extensions3DOpenGL::blitFramebuffer(long srcX0, long srcY0, long srcX1, long srcY1, long dstX0, long dstY0, long dstX1, long dstY1, unsigned long mask, unsigned long filter)
 {
-#if PLATFORM(QT)
-    m_context->m_functions->glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
-#else
     ::glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
-#endif
 }
 
 void Extensions3DOpenGL::renderbufferStorageMultisample(unsigned long target, unsigned long samples, unsigned long internalformat, unsigned long width, unsigned long height)
 {
-#if PLATFORM(QT)
-    m_context->m_functions->glRenderbufferStorageMultisample(target, samples, internalformat, width, height);
-#else
     ::glRenderbufferStorageMultisampleEXT(target, samples, internalformat, width, height);
-#endif
 }
 
 Platform3DObject Extensions3DOpenGL::createVertexArrayOES()
@@ -210,6 +225,23 @@ bool Extensions3DOpenGL::supportsExtension(const String& name)
         return m_availableExtensions.contains("GL_EXT_framebuffer_multisample");
 #endif
 
+#if PLATFORM(QT)
+    if (!m_context->isGLES2Compliant()) {
+#endif
+
+    // Desktop GL always supports GL_OES_rgb8_rgba8.
+    if (name == "GL_OES_rgb8_rgba8")
+        return true;
+
+    // If GL_ARB_texture_float is available then we report GL_OES_texture_float and
+    // GL_OES_texture_half_float as available.
+    if (name == "GL_OES_texture_float" || name == "GL_OES_texture_half_float")
+        return m_availableExtensions.contains("GL_ARB_texture_float");
+
+#if PLATFORM(QT)
+    }
+#endif
+
     // GL_OES_vertex_array_object
     if (name == "GL_OES_vertex_array_object") {
 #if (PLATFORM(GTK) || PLATFORM(EFL))
@@ -221,24 +253,24 @@ bool Extensions3DOpenGL::supportsExtension(const String& name)
 #endif
     }
 
+#if PLATFORM(QT)
     if (!m_context->isGLES2Compliant()) {
-        // Desktop GL always supports GL_OES_rgb8_rgba8.
-        if (name == "GL_OES_rgb8_rgba8")
-            return true;
+#endif
 
-        // If GL_ARB_texture_float is available then we report GL_OES_texture_float and
-        // GL_OES_texture_half_float as available.
-        if (name == "GL_OES_texture_float" || name == "GL_OES_texture_half_float")
-            return m_availableExtensions.contains("GL_ARB_texture_float");
+    // Desktop GL always supports the standard derivative functions
+    if (name == "GL_OES_standard_derivatives")
+        return true;
 
-        // Desktop GL always supports the standard derivative functions
-        if (name == "GL_OES_standard_derivatives")
-            return true;
+    // Desktop GL always supports UNSIGNED_INT indices
+    if (name == "GL_OES_element_index_uint")
+        return true;
 
-        // Desktop GL always supports UNSIGNED_INT indices
-        if (name == "GL_OES_element_index_uint")
-            return true;
+#if PLATFORM(QT)
     }
+#endif
+
+    if (name == "GL_EXT_texture_filter_anisotropic")
+        return m_availableExtensions.contains("GL_EXT_texture_filter_anisotropic");
 
     if (name == "GL_EXT_draw_buffers") {
 #if PLATFORM(MAC)

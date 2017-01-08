@@ -67,6 +67,55 @@
 #include <BlackBerryPlatformLog.h>
 #endif
 
+#if PLATFORM(QT)
+
+///////////////////////////////////////////////////////////////////////////////
+// HALT!
+//
+// This macro breaks if clauses with single statement, i.e. all code looking
+// like
+//
+//   if (...)
+//       ::glThingy(...)
+//
+//  starts calling glThingy unconditionally. Fix it before merging this changes!
+//
+///////////////////////////////////////////////////////////////////////////////
+
+ALWAYS_INLINE static void doNothing() {}
+#define GLFUN(f) doNothing(); m_functions->f
+
+#define glBindFramebufferEXT        GLFUN(glBindFramebuffer)
+#define glActiveTexture             GLFUN(glActiveTexture)
+#define glBindTexture               GLFUN(glBindTexture)
+#define glCopyTexImage2D            GLFUN(glCopyTexImage2D)
+#define glFinish                    GLFUN(glFinish)
+#define glGetIntegerv               GLFUN(glGetIntegerv)
+#define glClearStencil              GLFUN(glClearStencil)
+#define glStencilMaskSeparate       GLFUN(glStencilMaskSeparate)
+#define glAttachShader              GLFUN(glAttachShader)
+#define glDetachShader              GLFUN(glDetachShader)
+#define glBindAttribLocation        GLFUN(glBindAttribLocation)
+#define glShaderSource              GLFUN(glShaderSource)
+#define glCompileShader             GLFUN(glCompileShader)
+#define glGetShaderInfoLog          GLFUN(glGetShaderInfoLog)
+#define glClear                     GLFUN(glClear)
+#define glClearColor                GLFUN(glClearColor)
+#define glColorMask                 GLFUN(glColorMask)
+//#define glIsEnabled                 GLFUN(glIsEnabled)
+//#define glEnable                    GLFUN(glEnable)
+//#define glDisable                   GLFUN(glDisable)
+#define glEnableVertexAttribArray   GLFUN(glEnableVertexAttribArray)
+#define glDisableVertexAttribArray  GLFUN(glDisableVertexAttribArray)
+#define glCopyTexSubImage2D         GLFUN(glCopyTexSubImage2D)
+#define glDrawArrays                GLFUN(glDrawArrays)
+#define glDrawElements              GLFUN(glDrawElements)
+#define glGenerateMipmap            GLFUN(glGenerateMipmap)
+#define glGetProgramiv              GLFUN(glGetProgramiv)
+#define glGetProgramInfoLog         GLFUN(glGetProgramInfoLog)
+
+#endif
+
 namespace WebCore {
 
 PassRefPtr<GraphicsContext3D> GraphicsContext3D::createForCurrentGLContext()
@@ -164,15 +213,15 @@ void GraphicsContext3D::prepareTexture()
     if (m_attrs.antialias)
         resolveMultisamplingIfNecessary();
 
-    m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
-    m_functions->glActiveTexture(GL_TEXTURE0);
-    m_functions->glBindTexture(GL_TEXTURE_2D, m_compositorTexture);
-    m_functions->glCopyTexImage2D(GL_TEXTURE_2D, 0, m_internalColorFormat, 0, 0, m_currentWidth, m_currentHeight, 0);
-    m_functions->glBindTexture(GL_TEXTURE_2D, m_state.boundTexture0);
-    m_functions->glActiveTexture(m_state.activeTexture);
+    ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_fbo);
+    ::glActiveTexture(GL_TEXTURE0);
+    ::glBindTexture(GL_TEXTURE_2D, m_compositorTexture);
+    ::glCopyTexImage2D(GL_TEXTURE_2D, 0, m_internalColorFormat, 0, 0, m_currentWidth, m_currentHeight, 0);
+    ::glBindTexture(GL_TEXTURE_2D, m_state.boundTexture0);
+    ::glActiveTexture(m_state.activeTexture);
     if (m_state.boundFBO != m_fbo)
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_state.boundFBO);
-    m_functions->glFinish();
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_state.boundFBO);
+    ::glFinish();
     m_layerComposited = true;
 }
 #endif
@@ -187,18 +236,18 @@ void GraphicsContext3D::readRenderingResults(unsigned char *pixels, int pixelsSi
     bool mustRestoreFBO = false;
     if (m_attrs.antialias) {
         resolveMultisamplingIfNecessary();
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_fbo);
         mustRestoreFBO = true;
     } else {
         if (m_state.boundFBO != m_fbo) {
             mustRestoreFBO = true;
-            m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
+            ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_fbo);
         }
     }
 
     GLint packAlignment = 4;
     bool mustRestorePackAlignment = false;
-    m_functions->glGetIntegerv(GL_PACK_ALIGNMENT, &packAlignment);
+    ::glGetIntegerv(GL_PACK_ALIGNMENT, &packAlignment);
     if (packAlignment > 4) {
         m_functions->glPixelStorei(GL_PACK_ALIGNMENT, 4);
         mustRestorePackAlignment = true;
@@ -210,7 +259,7 @@ void GraphicsContext3D::readRenderingResults(unsigned char *pixels, int pixelsSi
         m_functions->glPixelStorei(GL_PACK_ALIGNMENT, packAlignment);
 
     if (mustRestoreFBO)
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_state.boundFBO);
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_state.boundFBO);
 }
 
 void GraphicsContext3D::reshape(int width, int height)
@@ -243,9 +292,9 @@ void GraphicsContext3D::reshape(int width, int height)
     GLboolean isDitherEnabled = GL_FALSE;
     GLbitfield clearMask = GL_COLOR_BUFFER_BIT;
     m_functions->glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColor);
-    m_functions->glClearColor(0, 0, 0, 0);
+    ::glClearColor(0, 0, 0, 0);
     m_functions->glGetBooleanv(GL_COLOR_WRITEMASK, colorMask);
-    m_functions->glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    ::glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     if (m_attrs.depth) {
         m_functions->glGetFloatv(GL_DEPTH_CLEAR_VALUE, &clearDepth);
         GraphicsContext3D::clearDepth(1);
@@ -254,40 +303,40 @@ void GraphicsContext3D::reshape(int width, int height)
         clearMask |= GL_DEPTH_BUFFER_BIT;
     }
     if (m_attrs.stencil) {
-        m_functions->glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &clearStencil);
-        m_functions->glClearStencil(0);
-        m_functions->glGetIntegerv(GL_STENCIL_WRITEMASK, reinterpret_cast<GLint*>(&stencilMask));
-        m_functions->glStencilMaskSeparate(GL_FRONT, 0xffffffff);
+        ::glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &clearStencil);
+        ::glClearStencil(0);
+        ::glGetIntegerv(GL_STENCIL_WRITEMASK, reinterpret_cast<GLint*>(&stencilMask));
+        ::glStencilMaskSeparate(GL_FRONT, 0xffffffff);
         clearMask |= GL_STENCIL_BUFFER_BIT;
     }
-    isScissorEnabled = m_functions->glIsEnabled(GL_SCISSOR_TEST);
-    m_functions->glDisable(GL_SCISSOR_TEST);
-    isDitherEnabled = m_functions->glIsEnabled(GL_DITHER);
-    m_functions->glDisable(GL_DITHER);
+    isScissorEnabled = ::glIsEnabled(GL_SCISSOR_TEST);
+    ::glDisable(GL_SCISSOR_TEST);
+    isDitherEnabled = ::glIsEnabled(GL_DITHER);
+    ::glDisable(GL_DITHER);
 
-    m_functions->glClear(clearMask);
+    ::glClear(clearMask);
 
-    m_functions->glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-    m_functions->glColorMask(colorMask[0], colorMask[1], colorMask[2], colorMask[3]);
+    ::glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+    ::glColorMask(colorMask[0], colorMask[1], colorMask[2], colorMask[3]);
     if (m_attrs.depth) {
         GraphicsContext3D::clearDepth(clearDepth);
         m_functions->glDepthMask(depthMask);
     }
     if (m_attrs.stencil) {
-        m_functions->glClearStencil(clearStencil);
-        m_functions->glStencilMaskSeparate(GL_FRONT, stencilMask);
+        ::glClearStencil(clearStencil);
+        ::glStencilMaskSeparate(GL_FRONT, stencilMask);
     }
     if (isScissorEnabled)
-        m_functions->glEnable(GL_SCISSOR_TEST);
+        ::glEnable(GL_SCISSOR_TEST);
     else
-        m_functions->glDisable(GL_SCISSOR_TEST);
+        ::glDisable(GL_SCISSOR_TEST);
     if (isDitherEnabled)
-        m_functions->glEnable(GL_DITHER);
+        ::glEnable(GL_DITHER);
     else
-        m_functions->glDisable(GL_DITHER);
+        ::glDisable(GL_DITHER);
 
     if (mustRestoreFBO)
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_state.boundFBO);
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_state.boundFBO);
 
     m_functions->glFlush();
 }
@@ -301,7 +350,7 @@ void GraphicsContext3D::activeTexture(GC3Denum texture)
 {
     makeContextCurrent();
     m_state.activeTexture = texture;
-    m_functions->glActiveTexture(texture);
+    ::glActiveTexture(texture);
 }
 
 void GraphicsContext3D::attachShader(Platform3DObject program, Platform3DObject shader)
@@ -309,14 +358,14 @@ void GraphicsContext3D::attachShader(Platform3DObject program, Platform3DObject 
     ASSERT(program);
     ASSERT(shader);
     makeContextCurrent();
-    m_functions->glAttachShader(program, shader);
+    ::glAttachShader(program, shader);
 }
 
 void GraphicsContext3D::bindAttribLocation(Platform3DObject program, GC3Duint index, const String& name)
 {
     ASSERT(program);
     makeContextCurrent();
-    m_functions->glBindAttribLocation(program, index, name.utf8().data());
+    ::glBindAttribLocation(program, index, name.utf8().data());
 }
 
 void GraphicsContext3D::bindBuffer(GC3Denum target, Platform3DObject buffer)
@@ -338,7 +387,7 @@ void GraphicsContext3D::bindFramebuffer(GC3Denum target, Platform3DObject buffer
         fbo = (m_attrs.antialias ? m_multisampleFBO : m_fbo);
 #endif
     if (fbo != m_state.boundFBO) {
-        m_functions->glBindFramebuffer(target, fbo);
+        ::glBindFramebufferEXT(target, fbo);
         m_state.boundFBO = fbo;
     }
 }
@@ -355,7 +404,7 @@ void GraphicsContext3D::bindTexture(GC3Denum target, Platform3DObject texture)
     makeContextCurrent();
     if (m_state.activeTexture == GL_TEXTURE0 && target == GL_TEXTURE_2D)
         m_state.boundTexture0 = texture;
-    m_functions->glBindTexture(target, texture);
+    ::glBindTexture(target, texture);
 }
 
 void GraphicsContext3D::blendColor(GC3Dclampf red, GC3Dclampf green, GC3Dclampf blue, GC3Dclampf alpha)
@@ -416,25 +465,25 @@ GC3Denum GraphicsContext3D::checkFramebufferStatus(GC3Denum target)
 void GraphicsContext3D::clearColor(GC3Dclampf r, GC3Dclampf g, GC3Dclampf b, GC3Dclampf a)
 {
     makeContextCurrent();
-    m_functions->glClearColor(r, g, b, a);
+    ::glClearColor(r, g, b, a);
 }
 
 void GraphicsContext3D::clear(GC3Dbitfield mask)
 {
     makeContextCurrent();
-    m_functions->glClear(mask);
+    ::glClear(mask);
 }
 
 void GraphicsContext3D::clearStencil(GC3Dint s)
 {
     makeContextCurrent();
-    m_functions->glClearStencil(s);
+    ::glClearStencil(s);
 }
 
 void GraphicsContext3D::colorMask(GC3Dboolean red, GC3Dboolean green, GC3Dboolean blue, GC3Dboolean alpha)
 {
     makeContextCurrent();
-    m_functions->glColorMask(red, green, blue, alpha);
+    ::glColorMask(red, green, blue, alpha);
 }
 
 void GraphicsContext3D::compileShader(Platform3DObject shader)
@@ -451,9 +500,9 @@ void GraphicsContext3D::compileShader(Platform3DObject shader)
     const char* translatedShaderPtr = translatedShaderCString.data();
     int translatedShaderLength = translatedShaderCString.length();
     
-    m_functions->glShaderSource(shader, 1, &translatedShaderPtr, &translatedShaderLength);
+    ::glShaderSource(shader, 1, &translatedShaderPtr, &translatedShaderLength);
 
-    m_functions->glCompileShader(shader);
+    ::glCompileShader(shader);
     
     int GLCompileSuccess;
     
@@ -469,7 +518,7 @@ void GraphicsContext3D::compileShader(Platform3DObject shader)
 
         GLsizei size = 0;
         OwnArrayPtr<GLchar> info = adoptArrayPtr(new GLchar[length]);
-        m_functions->glGetShaderInfoLog(shader, length, &size, info.get());
+        ::glGetShaderInfoLog(shader, length, &size, info.get());
 
         entry.log = info.get();
     }
@@ -488,13 +537,13 @@ void GraphicsContext3D::copyTexImage2D(GC3Denum target, GC3Dint level, GC3Denum 
 #if !PLATFORM(BLACKBERRY)
     if (m_attrs.antialias && m_state.boundFBO == m_multisampleFBO) {
         resolveMultisamplingIfNecessary(IntRect(x, y, width, height));
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_fbo);
     }
 #endif
-    m_functions->glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
+    ::glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
 #if !PLATFORM(BLACKBERRY)
     if (m_attrs.antialias && m_state.boundFBO == m_multisampleFBO)
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_multisampleFBO);
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_multisampleFBO);
 #endif
 }
 
@@ -504,13 +553,13 @@ void GraphicsContext3D::copyTexSubImage2D(GC3Denum target, GC3Dint level, GC3Din
 #if !PLATFORM(BLACKBERRY)
     if (m_attrs.antialias && m_state.boundFBO == m_multisampleFBO) {
         resolveMultisamplingIfNecessary(IntRect(x, y, width, height));
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_fbo);
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_fbo);
     }
 #endif
-    m_functions->glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+    ::glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 #if !PLATFORM(BLACKBERRY)
     if (m_attrs.antialias && m_state.boundFBO == m_multisampleFBO)
-        m_functions->glBindFramebuffer(GraphicsContext3D::FRAMEBUFFER, m_multisampleFBO);
+        ::glBindFramebufferEXT(GraphicsContext3D::FRAMEBUFFER, m_multisampleFBO);
 #endif
 }
 
@@ -537,49 +586,49 @@ void GraphicsContext3D::detachShader(Platform3DObject program, Platform3DObject 
     ASSERT(program);
     ASSERT(shader);
     makeContextCurrent();
-    m_functions->glDetachShader(program, shader);
+    ::glDetachShader(program, shader);
 }
 
 void GraphicsContext3D::disable(GC3Denum cap)
 {
     makeContextCurrent();
-    m_functions->glDisable(cap);
+    ::glDisable(cap);
 }
 
 void GraphicsContext3D::disableVertexAttribArray(GC3Duint index)
 {
     makeContextCurrent();
-    m_functions->glDisableVertexAttribArray(index);
+    ::glDisableVertexAttribArray(index);
 }
 
 void GraphicsContext3D::drawArrays(GC3Denum mode, GC3Dint first, GC3Dsizei count)
 {
     makeContextCurrent();
-    m_functions->glDrawArrays(mode, first, count);
+    ::glDrawArrays(mode, first, count);
 }
 
 void GraphicsContext3D::drawElements(GC3Denum mode, GC3Dsizei count, GC3Denum type, GC3Dintptr offset)
 {
     makeContextCurrent();
-    m_functions->glDrawElements(mode, count, type, reinterpret_cast<GLvoid*>(static_cast<intptr_t>(offset)));
+    ::glDrawElements(mode, count, type, reinterpret_cast<GLvoid*>(static_cast<intptr_t>(offset)));
 }
 
 void GraphicsContext3D::enable(GC3Denum cap)
 {
     makeContextCurrent();
-    m_functions->glEnable(cap);
+    ::glEnable(cap);
 }
 
 void GraphicsContext3D::enableVertexAttribArray(GC3Duint index)
 {
     makeContextCurrent();
-    m_functions->glEnableVertexAttribArray(index);
+    ::glEnableVertexAttribArray(index);
 }
 
 void GraphicsContext3D::finish()
 {
     makeContextCurrent();
-    m_functions->glFinish();
+    ::glFinish();
 }
 
 void GraphicsContext3D::flush()
@@ -609,7 +658,7 @@ void GraphicsContext3D::frontFace(GC3Denum mode)
 void GraphicsContext3D::generateMipmap(GC3Denum target)
 {
     makeContextCurrent();
-    m_functions->glGenerateMipmap(target);
+    ::glGenerateMipmap(target);
 }
 
 bool GraphicsContext3D::getActiveAttrib(Platform3DObject program, GC3Duint index, ActiveInfo& info)
@@ -620,7 +669,7 @@ bool GraphicsContext3D::getActiveAttrib(Platform3DObject program, GC3Duint index
     }
     makeContextCurrent();
     GLint maxAttributeSize = 0;
-    m_functions->glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeSize);
+    ::glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeSize);
     OwnArrayPtr<GLchar> name = adoptArrayPtr(new GLchar[maxAttributeSize]); // GL_ACTIVE_ATTRIBUTE_MAX_LENGTH includes null termination.
     GLsizei nameLength = 0;
     GLint size = 0;
@@ -646,7 +695,7 @@ bool GraphicsContext3D::getActiveUniform(Platform3DObject program, GC3Duint inde
 
     makeContextCurrent();
     GLint maxUniformSize = 0;
-    m_functions->glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxUniformSize);
+    ::glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxUniformSize);
 
     OwnArrayPtr<GLchar> name = adoptArrayPtr(new GLchar[maxUniformSize]); // GL_ACTIVE_UNIFORM_MAX_LENGTH includes null termination.
     GLsizei nameLength = 0;
@@ -771,7 +820,7 @@ GC3Dboolean GraphicsContext3D::isBuffer(Platform3DObject buffer)
 GC3Dboolean GraphicsContext3D::isEnabled(GC3Denum cap)
 {
     makeContextCurrent();
-    return m_functions->glIsEnabled(cap);
+    return ::glIsEnabled(cap);
 }
 
 GC3Dboolean GraphicsContext3D::isFramebuffer(Platform3DObject framebuffer)
@@ -890,7 +939,7 @@ void GraphicsContext3D::stencilMask(GC3Duint mask)
 void GraphicsContext3D::stencilMaskSeparate(GC3Denum face, GC3Duint mask)
 {
     makeContextCurrent();
-    m_functions->glStencilMaskSeparate(face, mask);
+    ::glStencilMaskSeparate(face, mask);
 }
 
 void GraphicsContext3D::stencilOp(GC3Denum fail, GC3Denum zfail, GC3Denum zpass)
@@ -1143,7 +1192,7 @@ void GraphicsContext3D::getFramebufferAttachmentParameteriv(GC3Denum target, GC3
 void GraphicsContext3D::getProgramiv(Platform3DObject program, GC3Denum pname, GC3Dint* value)
 {
     makeContextCurrent();
-    m_functions->glGetProgramiv(program, pname, value);
+    ::glGetProgramiv(program, pname, value);
 }
 
 String GraphicsContext3D::getProgramInfoLog(Platform3DObject program)
@@ -1152,13 +1201,13 @@ String GraphicsContext3D::getProgramInfoLog(Platform3DObject program)
 
     makeContextCurrent();
     GLint length = 0;
-    m_functions->glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+    ::glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
     if (!length)
         return String(); 
 
     GLsizei size = 0;
     OwnArrayPtr<GLchar> info = adoptArrayPtr(new GLchar[length]);
-    m_functions->glGetProgramInfoLog(program, length, &size, info.get());
+    ::glGetProgramInfoLog(program, length, &size, info.get());
 
     return String(info.get());
 }
@@ -1225,7 +1274,7 @@ String GraphicsContext3D::getShaderInfoLog(Platform3DObject shader)
 
     GLsizei size = 0;
     OwnArrayPtr<GLchar> info = adoptArrayPtr(new GLchar[length]);
-    m_functions->glGetShaderInfoLog(shader, length, &size, info.get());
+    ::glGetShaderInfoLog(shader, length, &size, info.get());
 
     return String(info.get());
 }

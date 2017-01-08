@@ -62,7 +62,11 @@ Extensions3DOpenGLCommon::Extensions3DOpenGLCommon(GraphicsContext3D* context)
     , m_maySupportMultisampling(true)
     , m_requiresBuiltInFunctionEmulation(false)
 {
+#if PLATFORM(QT)
     m_vendor = String(reinterpret_cast<const char*>(m_context->m_functions->glGetString(GL_VENDOR)));
+#else
+    m_vendor = String(reinterpret_cast<const char*>(::glGetString(GL_VENDOR)));
+#endif
 
     Vector<String> vendorComponents;
     m_vendor.lower().split(' ', vendorComponents);
