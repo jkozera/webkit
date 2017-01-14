@@ -212,9 +212,11 @@ void ImageBufferDataPrivateAccelerated::draw(GraphicsContext& destContext, const
     if (destContext.isAcceleratedContext()) {
         invalidateState();
 
+        auto* paintEngine = destContext.platformContext()->paintEngine();
+
         // If accelerated compositing is disabled, this may be the painter of the QGLWidget, which is a QGL2PaintEngineEx.
-        QOpenGL2PaintEngineEx* acceleratedPaintEngine = dynamic_cast<QOpenGL2PaintEngineEx*>(destContext.platformContext()->paintEngine());
-        if (acceleratedPaintEngine) {
+        if (paintEngine->type() == QPaintEngine::OpenGL2) {
+            auto* acceleratedPaintEngine = static_cast<QOpenGL2PaintEngineEx*>(paintEngine);
             QPaintDevice* targetPaintDevice = acceleratedPaintEngine->paintDevice();
 
             QRect rect(QPoint(), m_paintDevice->size());
