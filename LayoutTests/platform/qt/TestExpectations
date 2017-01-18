@@ -249,17 +249,17 @@ storage/storagequota-query-usage.html
 storage/storagequota-request-quota.html
 fast/workers/worker-storagequota-query-usage.html
 
-# ENABLE(WEBGL) is disabled.
-http/tests/canvas/webgl
-compositing/webgl
-fast/canvas/webgl
-fast/images/webgl-teximage2d.html
-http/tests/security/webgl-remote-read-remote-image-allowed.html
-http/tests/security/webgl-remote-read-remote-image-allowed-with-credentials.html
-http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin.html
-webgl/
-http/tests/webgl
-compositing/backface-visibility/backface-visibility-webgl.html [ Failure ]
+## ENABLE(WEBGL) is disabled.
+#http/tests/canvas/webgl
+#compositing/webgl
+#fast/canvas/webgl
+#fast/images/webgl-teximage2d.html
+#http/tests/security/webgl-remote-read-remote-image-allowed.html
+#http/tests/security/webgl-remote-read-remote-image-allowed-with-credentials.html
+#http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin.html
+##webgl/
+#http/tests/webgl
+#compositing/backface-visibility/backface-visibility-webgl.html [ Failure ]
 
 # ENABLE(DASHBOARD_SUPPORT) is disabled
 http/tests/xmlhttprequest/default-content-type-dashboard.html
