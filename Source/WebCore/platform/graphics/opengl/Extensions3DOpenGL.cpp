@@ -277,7 +277,7 @@ bool Extensions3DOpenGL::supportsExtension(const String& name)
     if (name == "GL_EXT_draw_buffers") {
 #if PLATFORM(IOS)
         return m_availableExtensions.contains(name);
-#elif PLATFORM(MAC) || PLATFORM(GTK)
+#elif PLATFORM(MAC) || PLATFORM(GTK) || (PLATFORM(QT) && QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
         return m_availableExtensions.contains("GL_ARB_draw_buffers");
 #else
         // FIXME: implement support for other platforms.
