@@ -200,7 +200,7 @@ perf/table-rows-length-caching.html [ Crash Pass ]
   http/tests/ssl/referer-301.html [ Pass Crash ]
   http/tests/websocket/tests/hybi/workers/worker-reload.html [ Pass Crash ]
 
-[ Release ]  http/tests/xmlhttprequest/onabort-response-getters.html [ Crash ]
+[ Release ]  http/tests/xmlhttprequest/onabort-response-getters.html [ Pass Crash ]
 
 # QTBUG-39577
 [ Debug ] svg/foreignObject/mask.html [ Crash ]
@@ -253,18 +253,6 @@ storage/storageinfo-request-quota.html
 storage/storagequota-query-usage.html
 storage/storagequota-request-quota.html
 fast/workers/worker-storagequota-query-usage.html
-
-## ENABLE(WEBGL) is disabled.
-#http/tests/canvas/webgl
-#compositing/webgl
-#fast/canvas/webgl
-#fast/images/webgl-teximage2d.html
-#http/tests/security/webgl-remote-read-remote-image-allowed.html
-#http/tests/security/webgl-remote-read-remote-image-allowed-with-credentials.html
-#http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin.html
-##webgl/
-#http/tests/webgl
-#compositing/backface-visibility/backface-visibility-webgl.html [ Failure ]
 
 # ENABLE(DASHBOARD_SUPPORT) is disabled
 http/tests/xmlhttprequest/default-content-type-dashboard.html
@@ -1262,6 +1250,35 @@ fullscreen/full-screen-plugin.html [ Skip ]
   fast/canvas/webgl/webgl-composite-modes-repaint.html [ ImageOnlyFailure ]
   fast/canvas/webgl/webgl-layer-update.html [ ImageOnlyFailure ]
 
+  fast/canvas/webgl/antialiasing-enabled.html [ Failure ]
+  fast/canvas/webgl/context-attributes-alpha-depth-stencil-antialias.html [ Failure ]
+  fast/canvas/webgl/premultiplyalpha-test.html [ Failure ]
+  fast/canvas/webgl/read-pixels-test.html [ Failure ]
+  fast/canvas/webgl/unprefixed-anisotropic-extension.html [ Failure ]
+  webgl/1.0.2/conformance/canvas/buffer-offscreen-test.html [ Failure ]
+  webgl/1.0.2/conformance/canvas/buffer-preserve-test.html [ Failure ]
+  webgl/1.0.2/conformance/context/context-attribute-preserve-drawing-buffer.html [ Failure ]
+  webgl/1.0.2/conformance/context/context-attributes-alpha-depth-stencil-antialias.html [ Failure ]
+  webgl/1.0.2/conformance/context/premultiplyalpha-test.html [ Failure ]
+  webgl/1.0.2/conformance/extensions/oes-texture-float.html [ Failure ]
+  webgl/1.0.2/conformance/glsl/literals/float_literal.vert.html [ Failure ]
+  webgl/1.0.2/conformance/ogles/GL/build/build_177_to_178.html [ Failure ]
+  webgl/1.0.2/conformance/reading/read-pixels-test.html [ Failure ]
+  webgl/1.0.2/conformance/textures/copy-tex-image-2d-formats.html [ Failure ]
+  webgl/1.0.2/conformance/textures/texture-attachment-formats.html [ Failure ]
+  webgl/1.0.2/conformance/textures/texture-mips.html [ Failure ]
+  webgl/1.0.2/conformance/textures/texture-npot.html [ Failure ]
+  webgl/1.0.2/conformance/textures/texture-size-limit.html [ Failure ]
+  webgl/1.0.3/conformance/attribs/gl-bindAttribLocation-aliasing.html [ Failure ]
+  webgl/1.0.3/conformance/attribs/gl-bindAttribLocation-matrix.html [ Failure ]
+  webgl/1.0.3/conformance/extensions/oes-texture-half-float.html [ Failure ]
+  webgl/1.0.3/conformance/extensions/webgl-compressed-texture-size-limit.html [ Failure ]
+  webgl/1.0.3/conformance/glsl/misc/shaders-with-invariance.html [ Failure ]
+  webgl/1.0.3/conformance/glsl/misc/shaders-with-name-conflicts.html [ Failure ]
+  webgl/1.0.3/conformance/renderbuffers/feedback-loop.html [ Failure ]
+  webgl/1.0.3/conformance/rendering/point-no-attributes.html [ Failure ]
+  webgl/1.0.3/conformance/textures/default-texture.html [ Failure ]
+  webgl/1.0.3/conformance/textures/texture-copying-feedback-loops.html [ Failure ]
 
 
 
@@ -1406,9 +1423,6 @@ http/tests/w3c/webperf/submission/Google/resource-timing/html/test_resource_cach
 http/tests/w3c/webperf/submission/Google/resource-timing/html/test_resource_connection_reuse.html
 
   http/tests/w3c/webperf/submission/Google/resource-timing/html/test_resource_iframe_self_navigation.html [ Skip ]
-  http/tests/webgl/1.0.2/origin-clean-conformance.html [ Skip ]
-  http/tests/webgl/1.0.2/texImage2DHTML.html [ Skip ]
-  http/tests/webgl/1.0.2/texSubImage2DHTML.html [ Skip ]
   http/tests/xmlhttprequest/post-blob-content-type-sync.html [ Skip ]
 
 js/regress/getter-richards-try-catch.html [ Timeout Pass ]
