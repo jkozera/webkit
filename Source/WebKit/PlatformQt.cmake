@@ -228,8 +228,19 @@ list(APPEND WebKit_SYSTEM_INCLUDE_DIRECTORIES
 # Build the include path with duplicates removed
 list(REMOVE_DUPLICATES WebKit_SYSTEM_INCLUDE_DIRECTORIES)
 
+if (ENABLE_WEBKIT2)
+    if (APPLE)
+        set(WEBKIT2_LIBRARY -Wl,-force_load WebKit2)
+    elseif (UNIX)
+        set(WEBKIT2_LIBRARY -Wl,--whole-archive WebKit2 -Wl,--no-whole-archive)
+    endif ()
+else ()
+    set(WEBKIT2_LIBRARY WebKit2)
+endif ()
+
 list(APPEND WebKit_LIBRARIES
     PRIVATE
+        ${WEBKIT2_LIBRARY}
         ${ICU_LIBRARIES}
         ${Qt5Positioning_LIBRARIES}
         ${X11_X11_LIB}
