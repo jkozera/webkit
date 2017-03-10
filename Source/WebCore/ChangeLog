@@ -1,3 +1,15 @@
+2017-03-09  Brady Eidson  <beidson@apple.com>
+
+        Add WKURLSchemeHandler API for handling custom protocols.
+        https://bugs.webkit.org/show_bug.cgi?id=169422
+
+        Reviewed by Tim Horton.
+
+        * platform/URLParser.cpp:
+        (WebCore::URLParser::maybeCanonicalizeScheme):
+        (WebCore::URLParser::isSpecialScheme):
+        * platform/URLParser.h:
+
 2016-09-16  Michael Catanzaro  <mcatanzaro@igalia.com>
 
         ASSERTION FAILED: The string being removed is atomic in the string table of an other thread! iterator != atomicStringTable.end() at Source/WTF/wtf/text/AtomicStringImpl.cpp(453)
