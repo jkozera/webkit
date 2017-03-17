@@ -28,6 +28,7 @@ list(APPEND WebKit2_INCLUDE_DIRECTORIES
     "${WEBKIT_DIR}/qt/Plugins"
 
     "${WEBKIT2_DIR}/NetworkProcess/CustomProtocols/qt"
+    "${WEBKIT2_DIR}/NetworkProcess/qt"
 
     "${WEBKIT2_DIR}/Shared/CoordinatedGraphics"
     "${WEBKIT2_DIR}/Shared/Plugins/unix"
@@ -60,6 +61,8 @@ list(APPEND WebKit2_SOURCES
     NetworkProcess/qt/NetworkProcessMainQt.cpp
     NetworkProcess/qt/NetworkProcessQt.cpp
     NetworkProcess/qt/RemoteNetworkingContextQt.cpp
+    NetworkProcess/qt/QtNetworkAccessManager.cpp
+    NetworkProcess/qt/QtNetworkReply.cpp
 
     Platform/qt/LoggingQt.cpp
     Platform/qt/ModuleQt.cpp
@@ -200,8 +203,6 @@ list(APPEND WebKit2_SOURCES
 
     WebProcess/qt/QtBuiltinBundle.cpp
     WebProcess/qt/QtBuiltinBundlePage.cpp
-    WebProcess/qt/QtNetworkAccessManager.cpp
-    WebProcess/qt/QtNetworkReply.cpp
     WebProcess/qt/SeccompFiltersWebProcessQt.cpp
     WebProcess/qt/WebProcessMainQt.cpp
     WebProcess/qt/WebProcessQt.cpp

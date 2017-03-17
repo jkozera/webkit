@@ -42,9 +42,7 @@
 #endif
 
 #if PLATFORM(QT)
-QT_BEGIN_NAMESPACE
-class QNetworkAccessManager;
-QT_END_NAMESPACE
+#include "QtNetworkAccessManager.h"
 #endif
 
 namespace WebCore {
@@ -106,7 +104,7 @@ public:
 #endif
 
 #if PLATFORM(QT)
-    QNetworkAccessManager* networkAccessManager() { return m_networkAccessManager; }
+    QNetworkAccessManager* networkAccessManager() { return &m_networkAccessManager; }
 #endif
 
     void prefetchDNS(const String&);
@@ -213,7 +211,7 @@ private:
 #endif
 
 #if PLATFORM(QT)
-    QNetworkAccessManager* m_networkAccessManager { nullptr };
+    QtNetworkAccessManager m_networkAccessManager;
 #endif
 };
 

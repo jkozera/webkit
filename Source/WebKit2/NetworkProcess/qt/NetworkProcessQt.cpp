@@ -38,11 +38,9 @@ namespace WebKit {
 
 void NetworkProcess::platformInitializeNetworkProcess(const NetworkProcessCreationParameters& parameters)
 {
-    m_networkAccessManager = new QtNetworkAccessManager(nullptr);
-
     if (!parameters.cookiePersistentStoragePath.isEmpty()) {
         WebCore::SharedCookieJarQt* jar = WebCore::SharedCookieJarQt::create(parameters.cookiePersistentStoragePath);
-        m_networkAccessManager->setCookieJar(jar);
+        m_networkAccessManager.setCookieJar(jar);
         // Do not let QNetworkAccessManager delete the jar.
         jar->setParent(0);
     }

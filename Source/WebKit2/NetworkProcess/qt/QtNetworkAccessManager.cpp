@@ -27,6 +27,7 @@
 #include "config.h"
 #include "QtNetworkAccessManager.h"
 
+#include "QtNetworkReply.h"
 #include "SharedMemory.h"
 #include "WebFrameNetworkingContext.h"
 #include "WebPage.h"
@@ -39,9 +40,8 @@
 
 namespace WebKit {
 
-QtNetworkAccessManager::QtNetworkAccessManager(WebProcess* webProcess)
+QtNetworkAccessManager::QtNetworkAccessManager()
     : QNetworkAccessManager()
-    , m_webProcess(webProcess)
 {
     connect(this, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     connect(this, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), SLOT(onProxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)));
