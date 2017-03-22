@@ -411,7 +411,6 @@ void QQuickWebViewPrivate::initialize(WKPageConfigurationRef configurationRef)
     preferences.setWebGLEnabled(true);
     preferences.setForceCompositingMode(true);
 
-    webPageProxy->registerApplicationScheme(ASCIILiteral("qrc"));
 
     q_ptr->setAcceptedMouseButtons(Qt::MouseButtonMask);
     q_ptr->setAcceptHoverEvents(true);
@@ -952,12 +951,11 @@ void QQuickWebViewPrivate::updateUserStyleSheets()
 
 void QQuickWebViewPrivate::updateSchemeDelegates()
 {
-    webPageProxy->registerApplicationScheme(ASCIILiteral("qrc"));
 
     QQmlListProperty<QQuickUrlSchemeDelegate> schemes = experimental->schemeDelegates();
     for (int i = 0, numSchemes = experimental->schemeDelegates_Count(&schemes); i < numSchemes; ++i) {
         QQuickUrlSchemeDelegate* scheme = experimental->schemeDelegates_At(&schemes, i);
-        webPageProxy->registerApplicationScheme(scheme->scheme());
+        //webPageProxy->registerApplicationScheme(scheme->scheme());
     }
 }
 
@@ -1608,7 +1606,7 @@ void QQuickWebViewExperimental::schemeDelegates_Append(QQmlListProperty<QQuickUr
         return;
     scheme->reply()->setWebViewExperimental(webViewExperimental);
     QQuickWebViewPrivate* d = webViewExperimental->d_func();
-    d->webPageProxy->registerApplicationScheme(scheme->scheme());
+    //d->webPageProxy->registerApplicationScheme(scheme->scheme());
 }
 
 int QQuickWebViewExperimental::schemeDelegates_Count(QQmlListProperty<QQuickUrlSchemeDelegate>* property)
@@ -1663,7 +1661,7 @@ void QQuickWebViewExperimental::invokeApplicationSchemeHandler(PassRefPtr<QtRefC
 
 void QQuickWebViewExperimental::sendApplicationSchemeReply(QQuickNetworkReply* reply)
 {
-    d_ptr->webPageProxy->sendApplicationSchemeReply(reply);
+    //d_ptr->webPageProxy->sendApplicationSchemeReply(reply);
 }
 
 void QQuickWebViewExperimental::goForwardTo(int index)

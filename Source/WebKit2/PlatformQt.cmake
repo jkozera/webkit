@@ -64,7 +64,6 @@ list(APPEND WebKit2_SOURCES
     NetworkProcess/qt/NetworkProcessQt.cpp
     NetworkProcess/qt/RemoteNetworkingContextQt.cpp
     NetworkProcess/qt/QtNetworkAccessManager.cpp
-    NetworkProcess/qt/QtNetworkReply.cpp
 
     Platform/qt/LoggingQt.cpp
     Platform/qt/ModuleQt.cpp
