@@ -474,11 +474,13 @@ void ImageBufferDataPrivateUnaccelerated::platformTransformColorSpace(const Vect
 
 // ---------------------- ImageBufferData
 
-ImageBufferData::ImageBufferData(const IntSize& size)
+ImageBufferData::ImageBufferData(const IntSize& size, float resolutionScale)
 {
     m_painter = new QPainter;
 
-    m_impl = new ImageBufferDataPrivateUnaccelerated(size);
+    IntSize scaledSize(size);
+    scaledSize.scale(resolutionScale);
+    m_impl = new ImageBufferDataPrivateUnaccelerated(scaledSize);
 
     if (!m_impl->paintDevice())
         return;
@@ -489,11 +491,13 @@ ImageBufferData::ImageBufferData(const IntSize& size)
 }
 
 #if ENABLE(ACCELERATED_2D_CANVAS)
-ImageBufferData::ImageBufferData(const IntSize& size, QOpenGLContext* compatibleContext)
+ImageBufferData::ImageBufferData(const IntSize& size, float resolutionScale, QOpenGLContext* compatibleContext)
 {
     m_painter = new QPainter;
 
-    m_impl = new ImageBufferDataPrivateAccelerated(size, compatibleContext);
+    IntSize scaledSize(size);
+    scaledSize.scale(resolutionScale);
+    m_impl = new ImageBufferDataPrivateAccelerated(scaledSize, compatibleContext);
 
     if (!m_impl->paintDevice())
         return;

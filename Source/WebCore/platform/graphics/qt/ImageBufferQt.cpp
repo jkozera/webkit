@@ -51,27 +51,33 @@
 namespace WebCore {
 
 #if ENABLE(ACCELERATED_2D_CANVAS)
-ImageBuffer::ImageBuffer(const IntSize& size, float /* resolutionScale */, ColorSpace, QOpenGLContext* compatibleContext, bool& success)
-    : m_data(size, compatibleContext)
+ImageBuffer::ImageBuffer(const IntSize& size, float resolutionScale, ColorSpace, QOpenGLContext* compatibleContext, bool& success)
+    : m_data(size, resolutionScale, compatibleContext)
     , m_size(size)
     , m_logicalSize(size)
+    , m_resolutionScale(resolutionScale)
 {
     success = m_data.m_painter && m_data.m_painter->isActive();
     if (!success)
         return;
+
+    m_size.scale(resolutionScale);
 
     m_data.m_context = std::make_unique<GraphicsContext>(m_data.m_painter);
 }
 #endif
 
-ImageBuffer::ImageBuffer(const FloatSize& size, float /* resolutionScale */, ColorSpace, RenderingMode /*renderingMode*/, bool& success)
-    : m_data(IntSize(size))
+ImageBuffer::ImageBuffer(const FloatSize& size, float resolutionScale, ColorSpace, RenderingMode /*renderingMode*/, bool& success)
+    : m_data(IntSize(size), resolutionScale)
     , m_size(size)
     , m_logicalSize(size)
+    , m_resolutionScale(resolutionScale)
 {
     success = m_data.m_painter && m_data.m_painter->isActive();
     if (!success)
         return;
+
+    m_size.scale(resolutionScale);
 
     m_data.m_context = std::make_unique<GraphicsContext>(m_data.m_painter);
 }
@@ -162,14 +168,20 @@ PassRefPtr<Uint8ClampedArray> getImageData(const IntRect& rect, const ImageBuffe
     return result.release();
 }
 
-PassRefPtr<Uint8ClampedArray> ImageBuffer::getUnmultipliedImageData(const IntRect& rect, CoordinateSystem) const
+PassRefPtr<Uint8ClampedArray> ImageBuffer::getUnmultipliedImageData(const IntRect& rect, CoordinateSystem coordinateSystem) const
 {
-    return getImageData<Unmultiplied>(rect, m_data, m_size);
+    IntRect scaledRect(rect);
+    if (coordinateSystem == LogicalCoordinateSystem)
+        scaledRect.scale(m_resolutionScale);
+    return getImageData<Unmultiplied>(scaledRect, m_data, m_size);
 }
 
-PassRefPtr<Uint8ClampedArray> ImageBuffer::getPremultipliedImageData(const IntRect& rect, CoordinateSystem) const
+PassRefPtr<Uint8ClampedArray> ImageBuffer::getPremultipliedImageData(const IntRect& rect, CoordinateSystem coordinateSystem) const
 {
-    return getImageData<Premultiplied>(rect, m_data, m_size);
+    IntRect scaledRect(rect);
+    if (coordinateSystem == LogicalCoordinateSystem)
+        scaledRect.scale(m_resolutionScale);
+    return getImageData<Premultiplied>(scaledRect, m_data, m_size);
 }
 
 void ImageBuffer::putByteArray(Multiply multiplied, Uint8ClampedArray* source, const IntSize& sourceSize, const IntRect& sourceRect, const IntPoint& destPoint, CoordinateSystem)
