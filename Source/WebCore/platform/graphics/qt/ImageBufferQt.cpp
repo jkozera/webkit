@@ -184,7 +184,7 @@ PassRefPtr<Uint8ClampedArray> ImageBuffer::getPremultipliedImageData(const IntRe
     return getImageData<Premultiplied>(scaledRect, m_data, m_size);
 }
 
-void ImageBuffer::putByteArray(Multiply multiplied, Uint8ClampedArray* source, const IntSize& sourceSize, const IntRect& sourceRect, const IntPoint& destPoint, CoordinateSystem)
+void ImageBuffer::putByteArray(Multiply multiplied, Uint8ClampedArray* source, const IntSize& sourceSize, const IntRect& sourceRect, const IntPoint& destPoint, CoordinateSystem coordinateSystem)
 {
     ASSERT(sourceRect.width() > 0);
     ASSERT(sourceRect.height() > 0);
@@ -201,9 +201,14 @@ void ImageBuffer::putByteArray(Multiply multiplied, Uint8ClampedArray* source, c
         m_data.m_painter->setClipping(false);
     }
 
+    IntSize scaledSourceSize(sourceSize);
+    if (coordinateSystem == LogicalCoordinateSystem) {
+        scaledSourceSize.scale(m_resolutionScale);
+    }
+
     // Let drawImage deal with the conversion.
     QImage::Format format = (multiplied == Unmultiplied) ? QImage::Format_RGBA8888 : QImage::Format_RGBA8888_Premultiplied;
-    QImage image(source->data(), sourceSize.width(), sourceSize.height(), format);
+    QImage image(source->data(), scaledSourceSize.width(), scaledSourceSize.height(), format);
 
     m_data.m_painter->setCompositionMode(QPainter::CompositionMode_Source);
     m_data.m_painter->drawImage(destPoint + sourceRect.location(), image, sourceRect);
