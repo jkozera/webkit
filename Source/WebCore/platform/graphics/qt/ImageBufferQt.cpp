@@ -104,9 +104,9 @@ GraphicsContext& ImageBuffer::context() const
     return *m_data.m_context;
 }
 
-RefPtr<Image> ImageBuffer::copyImage(BackingStoreCopy copyBehavior, ScaleBehavior) const
+RefPtr<Image> ImageBuffer::copyImage(BackingStoreCopy copyBehavior, ScaleBehavior scaleBehavior) const
 {
-    if (copyBehavior == CopyBackingStore)
+    if (copyBehavior == CopyBackingStore || (m_resolutionScale != 1 && scaleBehavior == Scaled))
         return m_data.m_impl->copyImage();
 
     return m_data.m_impl->image();
@@ -197,18 +197,24 @@ void ImageBuffer::putByteArray(Multiply multiplied, Uint8ClampedArray* source, c
 
         // putImageData() should be unaffected by painter state
         m_data.m_painter->resetTransform();
+        if (coordinateSystem == LogicalCoordinateSystem) {
+            m_data.m_painter->scale(m_resolutionScale, m_resolutionScale);
+        }
         m_data.m_painter->setOpacity(1.0);
         m_data.m_painter->setClipping(false);
     }
 
     IntSize scaledSourceSize(sourceSize);
+//    IntRect scaledSourceRect(sourceRect);
     if (coordinateSystem == LogicalCoordinateSystem) {
         scaledSourceSize.scale(m_resolutionScale);
+//        scaledSourceRect.scale(m_resolutionScale);
     }
 
     // Let drawImage deal with the conversion.
     QImage::Format format = (multiplied == Unmultiplied) ? QImage::Format_RGBA8888 : QImage::Format_RGBA8888_Premultiplied;
     QImage image(source->data(), scaledSourceSize.width(), scaledSourceSize.height(), format);
+    image.setDevicePixelRatio(m_resolutionScale);
 
     m_data.m_painter->setCompositionMode(QPainter::CompositionMode_Source);
     m_data.m_painter->drawImage(destPoint + sourceRect.location(), image, sourceRect);

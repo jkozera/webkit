@@ -83,6 +83,8 @@ void StillImage::draw(GraphicsContext& ctxt, const FloatRect& dst,
     FloatRect normalizedSrc = src.normalized();
     FloatRect normalizedDst = dst.normalized();
 
+    normalizedSrc.scale(m_pixmap->devicePixelRatio(), m_pixmap->devicePixelRatio());
+
     CompositeOperator previousOperator = ctxt.compositeOperation();
     BlendMode previousBlendMode = ctxt.blendModeOperation();
     ctxt.setCompositeOperation(op, blendMode);
@@ -97,6 +99,7 @@ void StillImage::draw(GraphicsContext& ctxt, const FloatRect& dst,
         }
     }
 
+    ctxt.platformContext()->resetTransform();
     ctxt.platformContext()->drawPixmap(normalizedDst, *m_pixmap, normalizedSrc);
     ctxt.setCompositeOperation(previousOperator, previousBlendMode);
 }

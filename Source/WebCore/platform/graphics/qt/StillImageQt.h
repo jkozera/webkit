@@ -59,6 +59,10 @@ namespace WebCore {
         PassNativeImagePtr nativeImageForCurrentFrame() override;
         void draw(GraphicsContext&, const FloatRect& dstRect, const FloatRect& srcRect, CompositeOperator, BlendMode, ImageOrientationDescription) override;
 
+        inline void setDevicePixelRatio(float pixelRatio) {
+            const_cast<QPixmap*>(m_pixmap)->setDevicePixelRatio(pixelRatio);
+        }
+
     private:
         StillImage(const QPixmap&);
         StillImage(const QPixmap*);

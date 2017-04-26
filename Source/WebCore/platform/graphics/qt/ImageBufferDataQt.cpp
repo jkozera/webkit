@@ -351,7 +351,7 @@ GraphicsSurfaceToken ImageBufferDataPrivateAccelerated::graphicsSurfaceToken() c
 // ---------------------- ImageBufferDataPrivateUnaccelerated
 
 struct ImageBufferDataPrivateUnaccelerated final : public ImageBufferDataPrivate {
-    ImageBufferDataPrivateUnaccelerated(const IntSize&);
+    ImageBufferDataPrivateUnaccelerated(const IntSize&, float);
     QPaintDevice* paintDevice() final { return m_pixmap.isNull() ? 0 : &m_pixmap; }
     QImage toQImage() const final;
     RefPtr<Image> image() const final;
@@ -369,11 +369,13 @@ struct ImageBufferDataPrivateUnaccelerated final : public ImageBufferDataPrivate
 
     QPixmap m_pixmap;
     RefPtr<Image> m_image;
+    float m_resolutionScale;
 };
 
-ImageBufferDataPrivateUnaccelerated::ImageBufferDataPrivateUnaccelerated(const IntSize& size)
+ImageBufferDataPrivateUnaccelerated::ImageBufferDataPrivateUnaccelerated(const IntSize& size, float resolutionScale)
     : m_pixmap(size)
     , m_image(StillImage::createForRendering(&m_pixmap))
+    , m_resolutionScale(resolutionScale)
 {
     m_pixmap.fill(QColor(Qt::transparent));
 }
@@ -390,6 +392,7 @@ QImage ImageBufferDataPrivateUnaccelerated::toQImage() const
     paintEngine->setPaintDevice(0);
     QImage image = m_pixmap.toImage();
     paintEngine->setPaintDevice(currentPaintDevice);
+    image.setDevicePixelRatio(m_resolutionScale);
     return image;
 }
 
@@ -400,7 +403,9 @@ RefPtr<Image> ImageBufferDataPrivateUnaccelerated::image() const
 
 RefPtr<Image> ImageBufferDataPrivateUnaccelerated::copyImage() const
 {
-    return StillImage::create(m_pixmap);
+    RefPtr<StillImage> res = StillImage::create(m_pixmap);
+    res->setDevicePixelRatio(m_resolutionScale);
+    return res;
 }
 
 RefPtr<Image> ImageBufferDataPrivateUnaccelerated::takeImage()
@@ -480,7 +485,7 @@ ImageBufferData::ImageBufferData(const IntSize& size, float resolutionScale)
 
     IntSize scaledSize(size);
     scaledSize.scale(resolutionScale);
-    m_impl = new ImageBufferDataPrivateUnaccelerated(scaledSize);
+    m_impl = new ImageBufferDataPrivateUnaccelerated(scaledSize, resolutionScale);
 
     if (!m_impl->paintDevice())
         return;
